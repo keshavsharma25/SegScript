@@ -7,6 +7,8 @@ import json
 from typing import Literal, Union, List
 from dataclasses import dataclass, field
 
+from model import enhance_transcript
+
 
 @dataclass
 class Snippet:
@@ -64,9 +66,9 @@ def save_transcript(video_id: str) -> Union[Literal[0], Literal[1]]:
     except YouTubeTranscriptApiException:
         return 1
 
-    Path("~/.segscript").expanduser().mkdir(exist_ok=True)
+    Path(f"~/.segscript/{video_id}").expanduser().mkdir(exist_ok=True)
 
-    output_path = Path(f"~/.segscript/{video_id}.json").expanduser()
+    output_path = Path(f"~/.segscript/{video_id}/{video_id}.json").expanduser()
 
     raw_transcript = ""
 
@@ -104,7 +106,7 @@ def query_transcript(video_id: str, time_range: str) -> str:
     Returns:
         The transcript text within the specified time range
     """
-    transcript_file = Path(f"~/.segscript/{video_id}.json").expanduser()
+    transcript_file = Path(f"~/.segscript/{video_id}/{video_id}.json").expanduser()
 
     if not transcript_file.exists():
         print(f"Transcript for video {video_id} not found. Fetching...")
@@ -116,10 +118,6 @@ def query_transcript(video_id: str, time_range: str) -> str:
         transcript_data = json.load(f)
 
     snippets = transcript_data["snippets"]
-
-    # If no time range specified, return the full transcript
-    if not time_range:
-        return transcript_data["transcript"]
 
     # Parse time range
     try:
@@ -142,7 +140,30 @@ def query_transcript(video_id: str, time_range: str) -> str:
     # Concatenate the text of the filtered snippets
     result_text = " ".join(snippet["text"] for snippet in filtered_snippets)
 
-    return result_text
+    enhanced_dir = Path(f"~/.segscript/{video_id}").expanduser()
+
+    # Generate a filename based on the time rang
+    time_range_str = (
+        time_range.replace(":", "_").replace(";", "-") if time_range else "full"
+    )
+    enhanced_file = enhanced_dir / f"{time_range_str}.txt"
+
+    # Check if we already have an enhanced version
+    if enhanced_file.exists():
+        with open(enhanced_file, "r", encoding="utf-8") as f:
+            return f.read()
+
+    # Otherwise, enhance the transcript
+    enhanced_text = enhance_transcript(result_text)
+
+    if enhanced_text and not enhanced_text.startswith("Error:"):
+        with open(enhanced_file, "w", encoding="utf-8") as f:
+            f.write(enhanced_text)
+
+        return enhanced_text
+
+    else:
+        return f"Enhanced Transcript is not available hence here's the raw-transcript of the segment: \n{result_text}"
 
 
 def get_raw_transcripts(video_id: str) -> Union[str, None]:
@@ -157,7 +178,7 @@ def get_raw_transcripts(video_id: str) -> Union[str, None]:
 
     """
     try:
-        transcript_path = Path(f"~/.segscript/{video_id}.json").expanduser()
+        transcript_path = Path(f"~/.segscript/{video_id}/{video_id}.json").expanduser()
         with open(transcript_path, mode="r", encoding="utf-8") as f:
             transcript_data: Transcript = json.load(f)
         return transcript_data.transcript
@@ -169,7 +190,7 @@ def get_raw_transcripts(video_id: str) -> Union[str, None]:
 
 def main():
     video_id = input("Enter YouTube video ID (the 11-character code in the URL): ")
-    transcript_file = Path(f"~/.segscript/{video_id}.json").expanduser()
+    transcript_file = Path(f"~/.segscript/{video_id}/{video_id}.json").expanduser()
 
     # Check if transcript already exists
     if transcript_file.exists():
