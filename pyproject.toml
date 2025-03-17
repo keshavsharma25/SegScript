@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "segscript"
+version = "0.1.0"
+description = "A tool for enhancing YouTube video transcripts"
+requires-python = ">=3.8"
+dependencies = [
+	"click",
+	"youtube-transcript-api",
+	"langchain",
+	"langchain-google-genai",
+	"python-dotenv",
+	"rich",
+	"requests",
+]
+
+[tool.setuptools]
+packages = ["segscript"]
