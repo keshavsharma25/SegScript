@@ -53,6 +53,22 @@ def parse_time_to_seconds(time_str: str) -> float:
         raise ValueError("Invalid time format. Use MM:SS or HH:MM:SS")
 
 
+def get_metadata(
+    video_id: str,
+) -> Union[Dict[str, str], None]:
+    oembed_url = f"https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v={video_id}&format=json"
+
+    response = requests.get(oembed_url)
+    if response.status_code == 200:
+        data = response.json()
+        return {
+            "title": data.get("title"),
+            "channel": data.get("author_name"),
+        }
+    else:
+        return None
+
+
 def save_transcript(video_id: str) -> Union[Literal[0], Literal[1]]:
     """
     Save transcript to $HOME/.segscript of a given video id if available.
