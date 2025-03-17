@@ -33,7 +33,12 @@ IMPORTANT RULES:
 - DO NOT add any new information not present in the original
 - DO NOT correct technical information even if it seems wrong
 - DO NOT summarize or condense the content
+- DO NOT correct grammar that is already correct
 - PRESERVE ALL the original content and meaning
+- PRESERVE the speaker's original style and tone
+- PRESERVE repetitive words or phrases that may be used for emphasis or to explain technical concepts
+- Be careful to distinguish between actual filler words and intentional repetition used to emphasize important points
+- ONLY remove clear filler words and add punctuation where needed
 
 Here are some examples of raw transcripts and their enhanced versions:
 
