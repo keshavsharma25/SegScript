@@ -160,7 +160,7 @@ def get(video_id, time_range):
 
 
 @main.command()
-def interactive():
+def prompt():
     """Start interactive mode for working with transcripts."""
     transcripts = get_all_transcripts()
 
