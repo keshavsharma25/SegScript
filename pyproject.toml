@@ -11,12 +11,19 @@ license = { file = "LICENSE" }
 dependencies = [
 	"click",
 	"youtube-transcript-api",
-	"langchain",
 	"langchain-google-genai",
 	"python-dotenv",
 	"rich",
 	"requests",
 ]
+
+
+[project.scripts]
+segscript = 'segscript.main:main'
+
+[project.urls]
+Homepage = "https://github.com/keshavsharma25/SegScript"
+Repository = "https://github.com/keshavsharma25/SegScript"
 
 [tool.setuptools]
 packages = ["segscript"]
