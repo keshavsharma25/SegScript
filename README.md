@@ -1,5 +1,9 @@
 # SegScript
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
+[![PyPI version](https://badge.fury.io/py/segscript.svg)](https://badge.fury.io/py/segscript)
+
 A command-line tool for managing, enhancing, and interacting with YouTube transcripts.
 
 <!-- mtoc-start -->
@@ -16,6 +20,7 @@ A command-line tool for managing, enhancing, and interacting with YouTube transc
   * [Download a transcript](#download-a-transcript)
   * [View a transcript for a specific section of a video](#view-a-transcript-for-a-specific-section-of-a-video)
   * [Interactive browsing](#interactive-browsing)
+* [Next TODOs](#next-todos)
 * [Contributing](#contributing)
 * [License](#license)
 * [Acknowledgments](#acknowledgments)
@@ -24,7 +29,7 @@ A command-line tool for managing, enhancing, and interacting with YouTube transc
 
 ## Overview
 
-SegScript allows you to download, view, and query YouTube video transcripts directly from your terminal. It provides a clean interface for working with transcripts, including the ability to extract specific time ranges and view enhanced transcript content.
+SegScript allows you to download, view, and query YouTube video transcripts directly from your terminal. It provides a clean interface for working with transcripts, including the ability to extract specific time ranges and view enhanced transcript content. I've used the `langchain-google-genai` package in conjunction with Google's Gemini Flash 2.0 model, which has delivered exceptional results in transcript enhancement.
 
 ## Features
 
@@ -37,12 +42,18 @@ SegScript allows you to download, view, and query YouTube video transcripts dire
 ## Installation
 
 ```bash
+pip install segscript
+```
+
+For testing purposes,
+
+```bash
 # Clone the repository
-git clone https://github.com/yourusername/segscript.git
+git clone https://github.com/keshavsharma25/segscript.git
 cd segscript
 
 # Install dependencies
-pip install -r requirements.txt
+pip install -r pyproject.toml
 
 # Install the package (optional)
 pip install -e .
@@ -122,6 +133,10 @@ segscript get dQw4w9WgXcQ --time-range "1:30;2:45"
 ```bash
 segscript interactive
 ```
+
+## Next TODOs
+
+* [ ] Add transcript summary support
 
 ## Contributing
 
