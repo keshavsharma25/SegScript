@@ -5,8 +5,9 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "segscript"
 version = "0.1.0"
-description = "A tool for enhancing YouTube video transcripts"
-requires-python = ">=3.8"
+description = "Extract, refine, and analyze YouTube video segments with precision"
+requires-python = ">=3.11"
+license = { file = "LICENSE" }
 dependencies = [
 	"click",
 	"youtube-transcript-api",
@@ -19,3 +20,12 @@ dependencies = [
 
 [tool.setuptools]
 packages = ["segscript"]
+
+[tool.ruff]
+line-length = 88
+indent-width = 4
+
+[tool.ruff.format]
+quote-style = "single"
+indent-style = "space"
+docstring-code-format = true
