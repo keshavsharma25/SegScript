@@ -93,6 +93,7 @@ Transcripts are stored in the `~/.segscript/` directory with the following struc
 
 ```
 ~/.segscript/
+├── .env                    # Environment variables file
 ├── VIDEO_ID_1/
 │   ├── VIDEO_ID_1.json     # Raw transcript data
 │   └── metadata.json       # Video metadata
