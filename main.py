@@ -121,14 +121,16 @@ def get(video_id, time_range):
         )
         transcript_text = query_transcript(video_id, time_range)
 
+        header_text = f"Transcript for {time_range.replace(';', ' ; ')}"
+
         console.print(
             Panel(
-                transcript_text,
-                title=f"Enhanced Transcript ({time_range})",
-                border_style="green",
-                expand=False,
+                Text(header_text, justify="center", style="bold magenta"),
+                border_style="blue",
+                expand=True,
             )
         )
+        console.print(transcript_text)
     else:
         console.print(
             f"[bold blue]Getting full transcript for {video_id}...[/bold blue]"
@@ -138,12 +140,21 @@ def get(video_id, time_range):
         if transcript_text:
             console.print(
                 Panel(
-                    Text(transcript_text, overflow="fold"),
-                    title="Full Transcript",
+                    Text("Preview Transcript", justify="center", style="bold magenta"),
                     border_style="blue",
-                    width=100,
+                    expand=True,
                 )
             )
+            console.print(Text(transcript_text[:1000] + "...", overflow="fold"))
+            if click.confirm("Show full transcript?"):
+                console.print(
+                    Panel(
+                        Text("Full Transcript", justify="center", style="bold magenta"),
+                        border_style="blue",
+                        expand=True,
+                    )
+                )
+                console.print(transcript_text)
         else:
             console.print("[bold red]Failed to get transcript![/bold red]")
 
@@ -196,31 +207,36 @@ def interactive():
         if transcript_text:
             console.print(
                 Panel(
-                    Text(transcript_text[:1000] + "...", overflow="fold"),
-                    title="Full Transcript (Preview)",
+                    Text("Preview Transcript", justify="center", style="bold magenta"),
                     border_style="blue",
+                    expand=True,
                 )
             )
+            console.print(Text(transcript_text[:1000] + "...", overflow="fold"))
             if click.confirm("Show full transcript?"):
                 console.print(
                     Panel(
-                        Text(transcript_text, overflow="fold"),
-                        title="Full Transcript",
+                        Text("Full Transcript", justify="center", style="bold magenta"),
                         border_style="blue",
+                        expand=True,
                     )
                 )
+                console.print(transcript_text)
+
     elif action == 2:
         time_range = click.prompt("Enter time range (e.g., '10:00;20:00')")
         transcript_text = query_transcript(selected_video, time_range)
 
+        header_text = f"Transcript for {time_range}"
+
         console.print(
             Panel(
-                transcript_text,
-                title=f"Enhanced Transcript ({time_range})",
-                border_style="green",
-                expand=False,
+                Text(header_text, justify="center", style="bold magenta"),
+                border_style="blue",
+                expand=True,
             )
         )
+        console.print(Text(transcript_text, overflow="fold", no_wrap=False))
     else:
         console.print("[bold red]Invalid choice![/bold red]")
 
