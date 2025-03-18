@@ -10,7 +10,7 @@ from pathlib import Path
 import json
 from typing import Dict, Literal, TypedDict, Union, List
 
-from model import enhance_transcript
+from .model import enhance_transcript
 
 
 class Snippet(TypedDict):
@@ -38,7 +38,7 @@ def parse_time_to_seconds(time_str: str) -> float:
     Returns:
         Time in seconds as a float
     """
-    parts = time_str.split(":")
+    parts = time_str.split(':')
 
     if len(parts) == 2:  # MM:SS format
         minutes, seconds = parts
@@ -47,20 +47,20 @@ def parse_time_to_seconds(time_str: str) -> float:
         hours, minutes, seconds = parts
         return int(hours) * 3600 + int(minutes) * 60 + float(seconds)
     else:
-        raise ValueError("Invalid time format. Use MM:SS or HH:MM:SS")
+        raise ValueError('Invalid time format. Use MM:SS or HH:MM:SS')
 
 
 def get_metadata(
     video_id: str,
 ) -> Union[Dict[str, str], None]:
-    oembed_url = f"https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v={video_id}&format=json"
+    oembed_url = f'https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v={video_id}&format=json'
 
     response = requests.get(oembed_url)
     if response.status_code == 200:
         data = response.json()
         return {
-            "title": data.get("title"),
-            "channel": data.get("author_name"),
+            'title': data.get('title'),
+            'channel': data.get('author_name'),
         }
     else:
         return None
@@ -84,7 +84,7 @@ def save_transcript(video_id: str) -> Union[Literal[0], Literal[1]]:
         transcript_list = ytt_api.list_transcripts(video_id)
 
         # Define various English language codes to check
-        english_codes = ["en", "en-US", "en-GB", "en-CA", "en-AU"]
+        english_codes = ['en', 'en-US', 'en-GB', 'en-CA', 'en-AU']
 
         # Initialize transcript variable
         transcript = None
@@ -114,44 +114,44 @@ def save_transcript(video_id: str) -> Union[Literal[0], Literal[1]]:
     except YouTubeTranscriptApiException:
         return 1
 
-    Path(f"~/.segscript/{video_id}").expanduser().mkdir(exist_ok=True)
+    Path(f'~/.segscript/{video_id}').expanduser().mkdir(exist_ok=True)
 
-    video_id_path = Path(f"~/.segscript/{video_id}").expanduser()
+    video_id_path = Path(f'~/.segscript/{video_id}').expanduser()
 
-    metadata_file = video_id_path / "metadata.json"
-    output_file = video_id_path / f"{video_id}.json"
+    metadata_file = video_id_path / 'metadata.json'
+    output_file = video_id_path / f'{video_id}.json'
 
-    raw_transcript = ""
+    raw_transcript = ''
 
     snippets: List[Snippet] = []
 
     for snippet in transcript.snippets:
-        raw_transcript = raw_transcript + " " + snippet.text
+        raw_transcript = raw_transcript + ' ' + snippet.text
 
         snippets.append(
             {
-                "text": snippet.text,
-                "start": snippet.start,
-                "duration": snippet.duration,
+                'text': snippet.text,
+                'start': snippet.start,
+                'duration': snippet.duration,
             }
         )
 
     transcript_dict: Transcript = {
-        "video_id": transcript.video_id,
-        "language": transcript.language,
-        "language_code": transcript.language_code,
-        "is_generated": transcript.is_generated,
-        "snippets": snippets,
-        "transcript": raw_transcript,
+        'video_id': transcript.video_id,
+        'language': transcript.language,
+        'language_code': transcript.language_code,
+        'is_generated': transcript.is_generated,
+        'snippets': snippets,
+        'transcript': raw_transcript,
     }
 
     metadata = get_metadata(video_id)
     if metadata:
-        with open(metadata_file, "w", encoding="utf-8") as f:
+        with open(metadata_file, 'w', encoding='utf-8') as f:
             json.dump(metadata, f, indent=2)
 
     # Write to JSON file
-    with open(output_file, "w", encoding="utf-8") as f:
+    with open(output_file, 'w', encoding='utf-8') as f:
         json.dump(transcript_dict, f, indent=2)
 
     return 0
@@ -169,22 +169,22 @@ def query_transcript(video_id: str, time_range: str) -> str:
     Returns:
         The transcript text within the specified time range
     """
-    transcript_file = Path(f"~/.segscript/{video_id}/{video_id}.json").expanduser()
+    transcript_file = Path(f'~/.segscript/{video_id}/{video_id}.json').expanduser()
 
     if not transcript_file.exists():
-        print(f"Transcript for video {video_id} not found. Fetching...")
+        print(f'Transcript for video {video_id} not found. Fetching...')
         success = save_transcript(video_id)
         if success != 0:
-            return "Error: Failed to fetch transcript!"
+            return 'Error: Failed to fetch transcript!'
 
-    with open(transcript_file, "r", encoding="utf-8") as f:
+    with open(transcript_file, 'r', encoding='utf-8') as f:
         transcript_data = json.load(f)
 
-    snippets = transcript_data["snippets"]
+    snippets = transcript_data['snippets']
 
     # Parse time range
     try:
-        start_time_str, end_time_str = time_range.split(";")
+        start_time_str, end_time_str = time_range.split(';')
         start_seconds = parse_time_to_seconds(start_time_str)
         end_seconds = parse_time_to_seconds(end_time_str)
     except ValueError:
@@ -193,34 +193,34 @@ def query_transcript(video_id: str, time_range: str) -> str:
     # Find snippets within the time range
     filtered_snippets = []
     for snippet in snippets:
-        snippet_start = snippet["start"]
-        snippet_end = snippet_start + snippet["duration"]
+        snippet_start = snippet['start']
+        snippet_end = snippet_start + snippet['duration']
 
         # Include snippet if it overlaps with the specified range
         if snippet_start <= end_seconds and snippet_end >= start_seconds:
             filtered_snippets.append(snippet)
 
     # Concatenate the text of the filtered snippets
-    result_text = " ".join(snippet["text"] for snippet in filtered_snippets)
+    result_text = ' '.join(snippet['text'] for snippet in filtered_snippets)
 
-    enhanced_dir = Path(f"~/.segscript/{video_id}").expanduser()
+    enhanced_dir = Path(f'~/.segscript/{video_id}').expanduser()
 
     # Generate a filename based on the time rang
     time_range_str = (
-        time_range.replace(":", "_").replace(";", "-") if time_range else "full"
+        time_range.replace(':', '_').replace(';', '-') if time_range else 'full'
     )
-    enhanced_file = enhanced_dir / f"{time_range_str}.txt"
+    enhanced_file = enhanced_dir / f'{time_range_str}.txt'
 
     # Check if we already have an enhanced version
     if enhanced_file.exists():
-        with open(enhanced_file, "r", encoding="utf-8") as f:
+        with open(enhanced_file, 'r', encoding='utf-8') as f:
             return f.read()
 
     # Otherwise, enhance the transcript
     enhanced_text = enhance_transcript(result_text)
 
-    if enhanced_text and not enhanced_text.startswith("Error:"):
-        with open(enhanced_file, "w", encoding="utf-8") as f:
+    if enhanced_text and not enhanced_text.startswith('Error:'):
+        with open(enhanced_file, 'w', encoding='utf-8') as f:
             f.write(enhanced_text)
 
         return enhanced_text
@@ -241,12 +241,12 @@ def get_raw_transcripts(video_id: str) -> Union[str, None]:
 
     """
     try:
-        transcript_path = Path(f"~/.segscript/{video_id}/{video_id}.json").expanduser()
-        with open(transcript_path, mode="r", encoding="utf-8") as f:
+        transcript_path = Path(f'~/.segscript/{video_id}/{video_id}.json').expanduser()
+        with open(transcript_path, mode='r', encoding='utf-8') as f:
             transcript_data: Transcript = json.load(f)
         if transcript_data:
-            return transcript_data.get("transcript", "Transcript is unavailable")
+            return transcript_data.get('transcript', 'Transcript is unavailable')
 
     except FileNotFoundError:
-        print(f"The transcript for video id: {video_id} does not exist")
+        print(f'The transcript for video id: {video_id} does not exist')
         return None

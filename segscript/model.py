@@ -1,19 +1,20 @@
 from dotenv import load_dotenv
+from pathlib import Path
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import ChatPromptTemplate
 from typing import Union, Literal
 import os
 
 
-load_dotenv()
+load_dotenv(dotenv_path=Path('~/.segscript/.env').expanduser())
 
 # Initialize the LLM
 try:
     llm = ChatGoogleGenerativeAI(
-        model="gemini-1.5-flash"
+        model='gemini-1.5-flash'
     )  # You mentioned gemini-2.0-flash, but I'm using 1.5 as fallback
 except Exception as e:
-    print(f"Error initializing Gemini model: {e}")
+    print(f'Error initializing Gemini model: {e}')
 
 
 # Define the prompt template for transcript enhancement
@@ -62,7 +63,7 @@ prompt = ChatPromptTemplate.from_template(ENHANCE_PROMPT)
 
 def enhance_transcript(
     transcript_text: str, max_retries: int = 3
-) -> Union[str, Literal["Error: Failed to enhance transcript"], None]:
+) -> Union[str, Literal['Error: Failed to enhance transcript'], None]:
     """
     Enhances a transcript by removing filler words, adding punctuation,
     and ensuring complete sentences.
@@ -74,11 +75,11 @@ def enhance_transcript(
     Returns:
         Enhanced transcript or error message
     """
-    if not transcript_text or transcript_text.strip() == "":
-        return "Error: Empty transcript provided"
+    if not transcript_text or transcript_text.strip() == '':
+        return 'Error: Empty transcript provided'
 
-    if not os.environ.get("GOOGLE_API_KEY"):
-        return "Error: GOOGLE_API_KEY environment variable not set"
+    if not os.environ.get('GOOGLE_API_KEY'):
+        return 'Error: GOOGLE_API_KEY environment variable not set'
 
     # Prepare the messages for the model
     messages = prompt.format_messages(transcript=transcript_text)
@@ -88,7 +89,7 @@ def enhance_transcript(
         try:
             response = llm.invoke(messages)
 
-            if hasattr(response, "content"):
+            if hasattr(response, 'content'):
                 content = response.content
                 if isinstance(content, str):
                     return content
@@ -96,10 +97,10 @@ def enhance_transcript(
                     return str(content)
         except Exception as e:
             if attempt < max_retries - 1:
-                print(f"Attempt {attempt + 1} failed: {e}. Retrying...")
+                print(f'Attempt {attempt + 1} failed: {e}. Retrying...')
             else:
-                print(f"All {max_retries} attempts failed: {e}")
-                return "Error: Failed to enhance transcript"
+                print(f'All {max_retries} attempts failed: {e}')
+                return 'Error: Failed to enhance transcript'
 
 
 def test_enhancement():
@@ -109,11 +110,11 @@ def test_enhancement():
     """
 
     enhanced = enhance_transcript(test_transcript)
-    print("Original transcript:")
+    print('Original transcript:')
     print(test_transcript)
-    print("\nEnhanced transcript:")
+    print('\nEnhanced transcript:')
     print(enhanced)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     test_enhancement()
