@@ -8,27 +8,24 @@ import requests
 
 from pathlib import Path
 import json
-from typing import Dict, Literal, Union, List
-from dataclasses import dataclass, field
+from typing import Dict, Literal, TypedDict, Union, List
 
 from model import enhance_transcript
 
 
-@dataclass
-class Snippet:
+class Snippet(TypedDict):
     text: str
     start: float
     duration: float
 
 
-@dataclass
-class Transcript:
+class Transcript(TypedDict):
     video_id: str
     language: str
     language_code: str
     is_generated: bool
-    snippets: List[Snippet] = field(default_factory=list)
-    transcript: str = ""
+    snippets: List[Snippet]
+    transcript: str
 
 
 def parse_time_to_seconds(time_str: str) -> float:
@@ -126,18 +123,25 @@ def save_transcript(video_id: str) -> Union[Literal[0], Literal[1]]:
 
     raw_transcript = ""
 
+    snippets: List[Snippet] = []
+
     for snippet in transcript.snippets:
         raw_transcript = raw_transcript + " " + snippet.text
 
-    transcript_dict = {
+        snippets.append(
+            {
+                "text": snippet.text,
+                "start": snippet.start,
+                "duration": snippet.duration,
+            }
+        )
+
+    transcript_dict: Transcript = {
         "video_id": transcript.video_id,
         "language": transcript.language,
         "language_code": transcript.language_code,
         "is_generated": transcript.is_generated,
-        "snippets": [
-            {"text": snippet.text, "start": snippet.start, "duration": snippet.duration}
-            for snippet in transcript.snippets
-        ],
+        "snippets": snippets,
         "transcript": raw_transcript,
     }
 
@@ -240,7 +244,8 @@ def get_raw_transcripts(video_id: str) -> Union[str, None]:
         transcript_path = Path(f"~/.segscript/{video_id}/{video_id}.json").expanduser()
         with open(transcript_path, mode="r", encoding="utf-8") as f:
             transcript_data: Transcript = json.load(f)
-        return transcript_data.transcript
+        if transcript_data:
+            return transcript_data.get("transcript", "Transcript is unavailable")
 
     except FileNotFoundError:
         print(f"The transcript for video id: {video_id} does not exist")
