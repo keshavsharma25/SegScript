@@ -5,6 +5,7 @@ from youtube_transcript_api._errors import (
 )
 
 import requests
+import textwrap
 
 from pathlib import Path
 import json
@@ -209,7 +210,7 @@ def query_transcript(video_id: str, time_range: str) -> str:
     time_range_str = (
         time_range.replace(':', '_').replace(';', '-') if time_range else 'full'
     )
-    enhanced_file = enhanced_dir / f'{time_range_str}.txt'
+    enhanced_file = enhanced_dir / f'{time_range_str}.md'
 
     # Check if we already have an enhanced version
     if enhanced_file.exists():
@@ -220,6 +221,8 @@ def query_transcript(video_id: str, time_range: str) -> str:
     enhanced_text = enhance_transcript(result_text)
 
     if enhanced_text and not enhanced_text.startswith('Error:'):
+        enhanced_text = format_markdown_text(enhanced_text)
+
         with open(enhanced_file, 'w', encoding='utf-8') as f:
             f.write(enhanced_text)
 
@@ -250,3 +253,64 @@ def get_raw_transcripts(video_id: str) -> Union[str, None]:
     except FileNotFoundError:
         print(f'The transcript for video id: {video_id} does not exist')
         return None
+
+
+def convert_topics_to_md_headers(text):
+    """
+    Convert [TOPIC: Topic Name] format to Markdown headers (#).
+
+    Parameters:
+    -----------
+    text : str
+        Text with topic markers in the format [TOPIC: Topic Name]
+
+    Returns:
+    --------
+    str
+        Text with topic markers converted to Markdown headers
+    """
+    import re
+
+    # Pattern to match [TOPIC: Topic Name]
+    pattern = r'\[TOPIC: (.*?)\]'
+
+    # Replace with Markdown header
+    markdown_text = re.sub(pattern, r'# \1', text)
+
+    return markdown_text
+
+
+def format_markdown_text(text, width=80):
+    """
+    Format markdown text with proper line wrapping.
+
+    Parameters:
+        text (str): The markdown text to format
+        width (int): Maximum line width (default: 80)
+
+    Returns:
+        str: Formatted markdown text
+    """
+
+    # Replace [TOPIC: {topic_name}] with headers
+    text = convert_topics_to_md_headers(text)
+
+    # Split text into paragraphs (blank lines between paragraphs)
+    paragraphs = text.split('\n\n')
+
+    formatted_paragraphs = []
+    for paragraph in paragraphs:
+        # Check if paragraph is a header (starts with #)
+        if paragraph.lstrip().startswith('#'):
+            formatted_paragraphs.append(paragraph)
+        else:
+            # First normalize whitespace within the paragraph
+            normalized = ' '.join(paragraph.split())
+            # Then wrap to specified width
+            wrapped = textwrap.fill(
+                normalized, width=width, break_long_words=False, break_on_hyphens=True
+            )
+            formatted_paragraphs.append(wrapped)
+
+    # Join paragraphs with double newlines
+    return '\n\n'.join(formatted_paragraphs)
