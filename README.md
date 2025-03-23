@@ -154,9 +154,10 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## Acknowledgments
 
-* A huge thanks to [Youtube Transcript API](https://github.com/jdepoix/youtube-transcript-api) to make my idea into a project.
-* Built with [Rich](https://github.com/Textualize/rich) for beautiful terminal output
-* Uses [Click](https://click.palletsprojects.com/) for command-line interface
+* A huge thanks to [Youtube Transcript API](https://github.com/jdepoix/youtube-transcript-api) for making transcript retrieval so easy and accessible.
+* Also kudos to [Langchain Google](https://github.com/langchain-ai/langchain-google) for the `langchain-google-genai`.
+* Built with [Rich](https://github.com/Textualize/rich) for beautiful terminal output.
+* Uses [Click](https://click.palletsprojects.com/) for command-line interface.
 
 ---
 
