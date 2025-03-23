@@ -30,6 +30,8 @@ Please make the following improvements to the transcript:
 3. Ensure complete sentences (make sure sentences start with a capital letter and end with proper punctuation)
 4. Break the text into paragraphs where appropriate
 5. Insert topic markers using the format "[TOPIC: Topic Name]" at the beginning of paragraphs that introduce new topics
+6. Format **important technical concepts** in **bold** using markdown double asterisks (**term**)
+7. Format *key insights and conclusions* in *italics* using markdown single asterisks (*insight*)
 
 
 IMPORTANT RULES:
@@ -47,6 +49,10 @@ IMPORTANT RULES:
 - DO NOT add topic markers between related paragraphs discussing the same concept
 - Topic markers are ONLY used to flag the start of topic transitions, not to replace any content
 - DO NOT skip over repetitive statements - they may be intentional for emphasis
+- DO NOT skip over repetitive statements - they may be intentional for emphasis
+- Use **bold formatting** ONLY for important technical terms, concepts, or methods that are central to understanding the content
+- Use *italic formatting* ONLY for key insights, conclusions, or statements that represent the main takeaways
+- DO NOT overuse formatting - only highlight the most significant elements (approximately 5-10% of the text)
 
 Here are some examples of raw transcripts and their enhanced versions:
 
