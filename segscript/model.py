@@ -29,6 +29,8 @@ Please make the following improvements to the transcript:
 2. Add appropriate punctuation (periods, commas, question marks, etc.)
 3. Ensure complete sentences (make sure sentences start with a capital letter and end with proper punctuation)
 4. Break the text into paragraphs where appropriate
+5. Insert topic markers using the format "[TOPIC: Topic Name]" at the beginning of paragraphs that introduce new topics
+
 
 IMPORTANT RULES:
 - DO NOT change any technical terms or jargon
@@ -42,18 +44,25 @@ IMPORTANT RULES:
 - PRESERVE repetitive words or phrases that may be used for emphasis or to explain technical concepts
 - Be careful to distinguish between actual filler words and intentional repetition used to emphasize important points
 - ONLY remove clear filler words and add punctuation where needed
+- DO NOT add topic markers between related paragraphs discussing the same concept
+- Topic markers are ONLY used to flag the start of topic transitions, not to replace any content
+- DO NOT skip over repetitive statements - they may be intentional for emphasis
 
 Here are some examples of raw transcripts and their enhanced versions:
 
 EXAMPLE 1:
 Raw: "so when we're talking about um asynchronous programming in javascript we uh we use promises which are like um objects that represent the eventual completion or failure of an asynchronous operation and uh the way you create a promise is you use the new promise constructor and you pass in a function that takes uh two parameters resolve and reject and um inside that function you do your async operation and when it's done you call resolve with the result or uh if there's an error you call reject and um then you can use then and catch methods to uh to handle the results or errors"
 
-Enhanced: "When we're talking about asynchronous programming in JavaScript, we use promises which are objects that represent the eventual completion or failure of an asynchronous operation. The way you create a promise is you use the new Promise constructor and you pass in a function that takes two parameters: resolve and reject. Inside that function, you do your async operation and when it's done, you call resolve with the result or if there's an error, you call reject. Then you can use then and catch methods to handle the results or errors."
+Enhanced: "[TOPIC: Asynchronous Programming in Javascript]
+
+When we're talking about asynchronous programming in JavaScript, we use promises which are objects that represent the eventual completion or failure of an asynchronous operation. The way you create a promise is you use the new Promise constructor and you pass in a function that takes two parameters: resolve and reject. Inside that function, you do your async operation and when it's done, you call resolve with the result or if there's an error, you call reject. Then you can use then and catch methods to handle the results or errors."
 
 EXAMPLE 2:
 Raw: "so gradient descent is basically um an optimization algorithm used to minimize the cost function in various machine learning algorithms and the way it works is um you start with some initial parameter values and then you compute the gradient of the cost function which is like um the direction of steepest increase and then you update the parameters in the negative direction of the gradient and uh you do this iteratively until the algorithm converges and um there are different variants like batch gradient descent and stochastic gradient descent which uh differ in how many samples they use to compute the gradient at each step"
 
-Enhanced: "Gradient descent is basically an optimization algorithm used to minimize the cost function in various machine learning algorithms. The way it works is you start with some initial parameter values and then you compute the gradient of the cost function, which is the direction of steepest increase. Then you update the parameters in the negative direction of the gradient. You do this iteratively until the algorithm converges. There are different variants like batch gradient descent and stochastic gradient descent, which differ in how many samples they use to compute the gradient at each step."
+Enhanced: "[TOPIC: Gradient Descent]
+
+Gradient descent is basically an optimization algorithm used to minimize the cost function in various machine learning algorithms. The way it works is you start with some initial parameter values and then you compute the gradient of the cost function, which is the direction of steepest increase. Then you update the parameters in the negative direction of the gradient. You do this iteratively until the algorithm converges. There are different variants like batch gradient descent and stochastic gradient descent, which differ in how many samples they use to compute the gradient at each step."
 
 Now, enhance the following transcript without changing its meaning or technical terminology:
 
