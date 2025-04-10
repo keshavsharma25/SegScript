@@ -12,7 +12,7 @@ load_dotenv(dotenv_path=Path('~/.segscript/.env').expanduser())
 try:
     llm = ChatGoogleGenerativeAI(
         model='gemini-1.5-flash',
-        temperature=0.25,
+        temperature=0.3,
         top_p=0.8,
     )  # You mentioned gemini-2.0-flash, but I'm using 1.5 as fallback
 except Exception as e:
@@ -21,56 +21,60 @@ except Exception as e:
 
 # Define the prompt template for transcript enhancement
 ENHANCE_PROMPT = """
-You are an AI assistant specialized in enhancing raw transcripts from YouTube videos, particularly about computer science and technology.
-Your task is to improve the readability of the transcript without changing its meaning or technical terminology.
+You are an AI assistant performing a **strictly defined text transformation task**. Your specialization is enhancing raw transcripts from YouTube videos, particularly those concerning computer science and technology.
+Your **sole objective** is to improve the readability of the provided transcript by applying **only** the specific rules listed below. You must **rigorously avoid** altering the original meaning, technical content, or speaker's intent.
 
-Please make the following improvements to the transcript:
-1. Remove filler words such as "um", "uh", "like", "you know", "sort of", "kind of", etc.
-2. Add appropriate punctuation (periods, commas, question marks, etc.)
-3. Ensure complete sentences (make sure sentences start with a capital letter and end with proper punctuation)
-4. Break the text into paragraphs where appropriate
-5. Insert topic markers using the format "[TOPIC: Topic Name]" at the beginning of paragraphs that introduce new topics
-6. Format **important technical concepts** in **bold** using markdown double asterisks (**term**)
-7. Format *key insights and conclusions* in *italics* using markdown single asterisks (*insight*)
+**Mandatory Enhancement Rules:**
 
+1.  **Filler Word Removal:** Delete **only** common filler words and verbal pauses. Examples include: "um", "uh", "ah", "hmm", "like" (when used as a filler, not for comparison), "you know", "sort of", "kind of", "basically", "actually", "really" (when used as filler/intensifier without adding meaning). Be extremely cautious: if a word *could* be intentional (e.g., repetition for emphasis), **preserve it**.
+2.  **Punctuation Addition:** Insert standard English punctuation (periods `.`, commas `,`, question marks `?`, exclamation points `!`, hyphens `-`, colons `:`) to form grammatically complete sentences and improve clarity. Ensure commas are used appropriately for clauses, lists, and separation.
+3.  **Sentence Capitalization:** Ensure every sentence begins with a capital letter.
+4.  **Paragraph Segmentation:** Divide the text into logical paragraphs. A new paragraph should typically start when the speaker shifts to a new distinct point, idea, or sub-topic. Do **not** create paragraphs for every sentence; group related sentences together.
+5.  **Topic Marker Insertion:** Insert topic markers using the exact format `[TOPIC: Concise Topic Name]` on a **new line directly before** the paragraph where a significant new topic is introduced.
+    *   The "Concise Topic Name" should accurately summarize the *main subject* of the subsequent paragraph(s).
+    *   Use topic markers **sparingly**, only for clear transitions between major subjects. Do **not** add them for minor elaborations or continuations of the same topic.
+    *   **IMPORTANT:** The `[TOPIC: ...]` marker is **purely an organizational label**. It is added *in addition* to the enhanced text. It does **not** replace any original text.
+    *   **CRITICAL:** The act of adding a topic marker must **not** change how you apply rules 1-4 to the text *within* the paragraph that follows it. Enhance the text following the marker using the exact same rules (punctuation, filler removal, no paraphrasing, etc.) as any other part of the transcript. **Do not shorten, summarize, or condense the content of a paragraph simply because a topic marker precedes it.**
 
-IMPORTANT RULES:
-- DO NOT change any technical terms or jargon
-- DO NOT paraphrase or substitute words with synonyms
-- DO NOT add any new information not present in the original
-- DO NOT correct technical information even if it seems wrong
-- DO NOT summarize or condense the content
-- DO NOT correct grammar that is already correct
-- PRESERVE ALL the original content and meaning
-- PRESERVE the speaker's original style and tone
-- PRESERVE repetitive words or phrases that may be used for emphasis or to explain technical concepts
-- Be careful to distinguish between actual filler words and intentional repetition used to emphasize important points
-- ONLY remove clear filler words and add punctuation where needed
-- DO NOT add topic markers between related paragraphs discussing the same concept
-- Topic markers are ONLY used to flag the start of topic transitions, not to replace any content
-- DO NOT skip over repetitive statements - they may be intentional for emphasis
-- DO NOT skip over repetitive statements - they may be intentional for emphasis
-- Use **bold formatting** ONLY for important technical terms, concepts, or methods that are central to understanding the content
-- Use *italic formatting* ONLY for key insights, conclusions, or statements that represent the main takeaways
-- DO NOT overuse formatting - only highlight the most significant elements (approximately 5-10% of the text)
+**Critical Constraints - Adhere Strictly:**
 
-Here are some examples of raw transcripts and their enhanced versions:
+*   **NO Meaning Change:** The enhanced text must convey the exact same information and nuance as the original.
+*   **NO Technical Alterations:** Do **not** change, correct, or simplify any technical terms, jargon, code snippets, or specific names, even if you suspect an error. Preserve them verbatim.
+*   **NO Paraphrasing/Synonyms:** Do **not** rephrase sentences or substitute words. Use the speaker's original vocabulary.
+*   **NO Summarization:** Do **not** condense, shorten, or omit any part of the original content. Every meaningful utterance must be represented. This applies equally to text following a `[TOPIC: ...]` marker.
+*   **NO Information Addition:** Do **not** insert any words, explanations, or information not present in the original transcript (other than the specified `[TOPIC: ...]` markers).
+*   **NO Grammar Correction (Beyond Punctuation/Sentences):** Do not alter sentence structure or word choices to "improve" grammar if the original was understandable. Focus *only* on applying punctuation and capitalization for sentence boundaries.
+*   **PRESERVE Speaker Style:** Maintain the speaker's tone and way of explaining things. If they use colloquialisms (that aren't fillers), keep them.
+*   **PRESERVE Intentional Repetition:** If words or phrases are repeated, assume it's for emphasis or clarity and **retain the repetition**. Do not "optimize" it away.
+*   **CONSISTENCY:** Apply these rules uniformly throughout the entire transcript segment.
+
+**Review Your Output:** Before finalizing, mentally check your enhanced text against the original and these rules. Did you change meaning? Did you remove non-filler words? Did you add information? Did you summarize? Did you summarize (especially after a topic marker)? Ensure **only** the allowed enhancements were made.
+
+**Examples (Illustrating the Rules):**
 
 EXAMPLE 1:
 Raw: "so when we're talking about um asynchronous programming in javascript we uh we use promises which are like um objects that represent the eventual completion or failure of an asynchronous operation and uh the way you create a promise is you use the new promise constructor and you pass in a function that takes uh two parameters resolve and reject and um inside that function you do your async operation and when it's done you call resolve with the result or uh if there's an error you call reject and um then you can use then and catch methods to uh to handle the results or errors"
 
-Enhanced: "[TOPIC: Asynchronous Programming in Javascript]
+Enhanced:
+[TOPIC: Asynchronous Programming in Javascript]
 
-When we're talking about asynchronous programming in JavaScript, we use promises which are objects that represent the eventual completion or failure of an asynchronous operation. The way you create a promise is you use the new Promise constructor and you pass in a function that takes two parameters: resolve and reject. Inside that function, you do your async operation and when it's done, you call resolve with the result or if there's an error, you call reject. Then you can use then and catch methods to handle the results or errors."
+When we're talking about asynchronous programming in JavaScript, we use promises which are objects that represent the eventual completion or failure of an asynchronous operation. The way you create a promise is you use the new Promise constructor and you pass in a function that takes two parameters: resolve and reject. Inside that function, you do your async operation and when it's done, you call resolve with the result or if there's an error, you call reject. Then you can use then and catch methods to handle the results or errors.
 
 EXAMPLE 2:
 Raw: "so gradient descent is basically um an optimization algorithm used to minimize the cost function in various machine learning algorithms and the way it works is um you start with some initial parameter values and then you compute the gradient of the cost function which is like um the direction of steepest increase and then you update the parameters in the negative direction of the gradient and uh you do this iteratively until the algorithm converges and um there are different variants like batch gradient descent and stochastic gradient descent which uh differ in how many samples they use to compute the gradient at each step"
 
-Enhanced: "[TOPIC: Gradient Descent]
+Enhanced:
+[TOPIC: Gradient Descent]
 
-Gradient descent is basically an optimization algorithm used to minimize the cost function in various machine learning algorithms. The way it works is you start with some initial parameter values and then you compute the gradient of the cost function, which is the direction of steepest increase. Then you update the parameters in the negative direction of the gradient. You do this iteratively until the algorithm converges. There are different variants like batch gradient descent and stochastic gradient descent, which differ in how many samples they use to compute the gradient at each step."
+Gradient descent is an optimization algorithm used to minimize the cost function in various machine learning algorithms. The way it works is you start with some initial parameter values and then you compute the gradient of the cost function, which is the direction of steepest increase. Then you update the parameters in the negative direction of the gradient. You do this iteratively until the algorithm converges.
 
-Now, enhance the following transcript without changing its meaning or technical terminology:
+[TOPIC: Gradient Descent Variants]
+
+There are different variants like batch gradient descent and stochastic gradient descent, which differ in how many samples they use to compute the gradient at each step.
+
+**(Note: Example 2 updated to show topic marker usage for a sub-topic transition)**
+
+Now, apply **only** the rules above to enhance the following transcript segment. Ensure strict adherence to all constraints.
 
 {transcript}
 """
