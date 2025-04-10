@@ -16,6 +16,7 @@ dependencies = [
 	"rich",
 	"requests",
 ]
+readme = "README.md"
 
 
 [project.scripts]
