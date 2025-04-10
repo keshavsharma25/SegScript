@@ -1,3 +1,6 @@
+import os
+import time
+
 import click
 from pathlib import Path
 import json
@@ -6,6 +9,7 @@ from rich.table import Table
 from rich.panel import Panel
 from rich.text import Text
 from rich import box
+from rich.markdown import Markdown
 from typing import List, Dict
 
 
@@ -63,12 +67,18 @@ def list():
 
     if not transcripts:
         console.print(
-            "[yellow]No transcripts found. Use the 'download' command to download a transcript.[/yellow]"
+            "[yellow]⚠️ No transcripts found. Use the 'download' command to download a transcript.[/yellow]"
         )
         return
 
-    table = Table(title='Downloaded Transcripts', box=box.ROUNDED)
-    table.add_column('Video ID', style='cyan')
+    table = Table(
+        title='[bold]Available Transcripts[/bold]',
+        box=box.ROUNDED,
+        show_header=True,
+        header_style='bold magenta',
+    )
+    table.add_column('#', style='dim cyan', justify='right')
+    table.add_column('Video ID', style='cyan', no_wrap=True)
     table.add_column('Title', style='green')
 
     for transcript in transcripts:
@@ -81,17 +91,17 @@ def list():
 @click.argument('video_id')
 def download(video_id):
     """Download a transcript for a YouTube video."""
-    console.print(f'[bold blue]Downloading transcript for {video_id}...[/bold blue]')
+    console.print(f'[bold blue]⏳ Downloading transcript for {video_id}...[/bold blue]')
 
     success = save_transcript(video_id)
 
     if success == 0:
         console.print(
-            f'[bold green]Transcript for {video_id} downloaded successfully![/bold green]'
+            f'[bold green]✅ Transcript for {video_id} downloaded successfully![/bold green]'
         )
     else:
         console.print(
-            f'[bold red]Failed to download transcript for {video_id}. Check the video ID or try again later.[/bold red]'
+            f'[bold red]❌ Failed to download transcript for {video_id}. Check the video ID or try again later.[/bold red]'
         )
 
 
@@ -108,7 +118,12 @@ def download(video_id):
     help='Maximum characters per line for wrapping the transcript text.',
 )
 def get(video_id, time_range, width):
-    """Get transcript for a video, optionally within a time range and enhanced."""
+    """
+    Get transcript for a video, optionally within a time range and enhanced.
+
+    If your VIDEO_ID starts with a hyphen '-', use '--' before it, e.g.:
+    `segscript get -- --your-video-id`
+    """
     transcript_file = Path(f'~/.segscript/{video_id}/{video_id}.json').expanduser()
 
     if not transcript_file.exists():
@@ -135,7 +150,7 @@ def get(video_id, time_range, width):
                 expand=True,
             )
         )
-        console.print(transcript_text)
+        console.print(Markdown(transcript_text))
     else:
         console.print(
             f'[bold blue]Getting full transcript for {video_id}...[/bold blue]'
@@ -159,7 +174,7 @@ def get(video_id, time_range, width):
                         expand=True,
                     )
                 )
-                console.print(transcript_text)
+                console.print(Markdown(transcript_text))
         else:
             console.print('[bold red]Failed to get transcript![/bold red]')
 
@@ -167,83 +182,133 @@ def get(video_id, time_range, width):
 @main.command()
 def prompt():
     """Start interactive mode for working with transcripts."""
-    transcripts = get_all_transcripts()
-
-    if not transcripts:
-        console.print(
-            '[yellow]No transcripts found. Downloading a new transcript...[/yellow]'
-        )
-        video_id = click.prompt('Enter YouTube video ID')
-        success = save_transcript(video_id)
-        if success != 0:
-            console.print('[bold red]Failed to download transcript![/bold red]')
-            return
+    while True:
         transcripts = get_all_transcripts()
 
-    # Display available transcripts
-    table = Table(title='Available Transcripts', box=box.ROUNDED)
-    table.add_column('#', style='cyan')
-    table.add_column('Video ID', style='green')
-    table.add_column('Title', style='blue')
+        # Display available transcripts
+        table = Table(
+            title='[bold]Available Transcripts[/bold]',
+            box=box.ROUNDED,
+            show_header=True,
+            header_style='bold magenta',
+        )
+        table.add_column('#', style='dim cyan', justify='right')
+        table.add_column('Video ID', style='cyan', no_wrap=True)
+        table.add_column('Title', style='green')
 
-    for i, transcript in enumerate(transcripts, 1):
-        table.add_row(str(i), transcript['video_id'], transcript['title'])
+        table.add_row('0', '[yellow i]-- Download New Transcript --[/yellow i]', '')
 
-    console.print(table)
+        for i, transcript in enumerate(transcripts, 1):
+            table.add_row(str(i), transcript['video_id'], transcript['title'])
 
-    # Let user select a transcript
-    selection = click.prompt('Select a transcript number', type=int, default=1)
-    if selection < 1 or selection > len(transcripts):
-        console.print('[bold red]Invalid selection![/bold red]')
-        return
+        console.print(table)
 
-    selected_video = transcripts[selection - 1]['video_id']
-    console.print(f'[bold green]Selected video: {selected_video}[/bold green]')
+        # Let user select a transcript
 
-    # Ask what to do with the selected transcript
-    console.print('\n[bold]What would you like to do?[/bold]')
-    console.print('[cyan]1.[/cyan] View full transcript')
-    console.print('[cyan]2.[/cyan] Get Enhanced query transcript by time range')
+        console.print(
+            f'➡️ Select # (0 to download, 1-{len(transcripts)} to use existing):'
+        )
+        selection = click.prompt('> ', type=int)
+        if selection < 0 or selection > len(transcripts):
+            console.print('[bold red]Invalid selection![/bold red]')
+            return
 
-    action = click.prompt('Enter your choice', type=int, default=1)
-
-    if action == 1:
-        transcript_text = get_raw_transcripts(selected_video)
-        if transcript_text:
+        if selection == 0:
+            console.print('\n➡️ Enter the YouTube Video ID to download:')
+            video_id_to_download = click.prompt('> ')
             console.print(
-                Panel(
-                    Text('Preview Transcript', justify='center', style='bold magenta'),
-                    border_style='blue',
-                    expand=True,
-                )
+                f'[bold blue]⏳ Downloading transcript for [cyan]{video_id_to_download}[/cyan]...[/bold blue]'
             )
-            console.print(Text(transcript_text[:1000] + '...', overflow='fold'))
-            if click.confirm('Show full transcript?'):
+            # Call save_transcript directly.
+            success = save_transcript(video_id_to_download)
+            if success == 0:
+                console.print(
+                    f'[bold green]✅ Transcript for [cyan]{video_id_to_download}[/cyan] downloaded successfully![/bold green]'
+                )
+            else:
+                console.print(
+                    f'[bold red]❌ Failed to download transcript for {video_id_to_download}. Check ID or API limits.[/bold red]'
+                )
+
+            time.sleep(2)
+            os.system('cls' if os.name == 'nt' else 'clear')
+
+            continue
+        else:
+            selected_transcript = transcripts[selection - 1]
+            selected_video_id = selected_transcript['video_id']
+            selected_title = selected_transcript.get('title', 'Unknown Title')
+
+            console.print(
+                f'[bold green]Selected video: [/bold green] [{selected_video_id}] {selected_title}'
+            )
+
+            # Ask what to do with the selected transcript
+            console.print('\n[bold underline]Choose an action:[/bold underline]')
+            console.print('[cyan] 1.[/] View full [dim]raw[/dim] transcript')
+            console.print(
+                '[cyan] 2.[/] Get [dim]enhanced[/dim] transcript segment by time range'
+            )
+
+            action = click.prompt('> ', type=int, default=1)
+
+            if action == 1:
+                transcript_text = get_raw_transcripts(selected_video_id)
+                if transcript_text:
+                    console.print(
+                        Panel(
+                            Text(
+                                'Raw Transcript Preview',
+                                justify='center',
+                                style='bold magenta',
+                            ),
+                            border_style='blue',
+                            expand=True,
+                        )
+                    )
+                    console.print(
+                        Text(transcript_text[:1000] + '...', overflow='fold'),
+                        highlight=False,
+                    )
+                    if click.confirm('Show full transcript?'):
+                        console.print(
+                            Panel(
+                                Text(
+                                    f'Full Raw Transcript: {selected_video_id}',
+                                    justify='center',
+                                    style='bold magenta',
+                                ),
+                                border_style='blue',
+                                expand=True,
+                            )
+                        )
+                        console.print(Markdown(transcript_text))
+
+            elif action == 2:
+                console.print(
+                    "➡️ Enter time range (e.g., '1:23;4:56' or '10:00;25:30'):"
+                )
+                time_range = click.prompt('> ')
+                console.print(
+                    '➡️Enter the max characters per line to format the transcript text (Default=60)'
+                )
+                width: int = click.prompt('> ')
+
+                console.print(
+                    f'\n[bold blue]Processing transcript segment for [cyan]{selected_video_id}[/cyan] ({time_range})...[/bold blue]'
+                )
+                transcript_text = query_transcript(selected_video_id, time_range, width)
+
+                header_text = f'Transcript for {time_range}'
+
                 console.print(
                     Panel(
-                        Text('Full Transcript', justify='center', style='bold magenta'),
+                        Text(header_text, justify='center', style='bold magenta'),
                         border_style='blue',
                         expand=True,
                     )
                 )
-                console.print(transcript_text)
-
-    elif action == 2:
-        time_range = click.prompt("Enter time range (e.g., '10:00;20:00')")
-        transcript_text = query_transcript(selected_video, time_range)
-        width = click.prompt(
-            'Enter the maximum characters per line to format the transcript text'
-        )
-
-        header_text = f'Transcript for {time_range}'
-
-        console.print(
-            Panel(
-                Text(header_text, justify='center', style='bold magenta'),
-                border_style='blue',
-                expand=True,
-            )
-        )
-        console.print(Text(transcript_text, overflow='fold', no_wrap=False))
-    else:
-        console.print('[bold red]Invalid choice![/bold red]')
+                console.print(Markdown(transcript_text))
+            else:
+                console.print('[bold red]Invalid choice![/bold red]')
+            break
