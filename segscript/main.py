@@ -102,7 +102,12 @@ def download(video_id):
     '-t',
     help="Time range in format 'start_time;end_time' (e.g. '10:00;20:00')",
 )
-def get(video_id, time_range):
+@click.option(
+    '--width',
+    '-w',
+    help='Maximum characters per line for wrapping the transcript text.',
+)
+def get(video_id, time_range, width):
     """Get transcript for a video, optionally within a time range and enhanced."""
     transcript_file = Path(f'~/.segscript/{video_id}/{video_id}.json').expanduser()
 
@@ -119,7 +124,7 @@ def get(video_id, time_range):
         console.print(
             f'[bold blue]Getting transcript for {video_id} from {time_range}...[/bold blue]'
         )
-        transcript_text = query_transcript(video_id, time_range)
+        transcript_text = query_transcript(video_id, time_range, width)
 
         header_text = f'Transcript for {time_range.replace(";", " ; ")}'
 
@@ -226,6 +231,9 @@ def prompt():
     elif action == 2:
         time_range = click.prompt("Enter time range (e.g., '10:00;20:00')")
         transcript_text = query_transcript(selected_video, time_range)
+        width = click.prompt(
+            'Enter the maximum characters per line to format the transcript text'
+        )
 
         header_text = f'Transcript for {time_range}'
 

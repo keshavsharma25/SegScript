@@ -158,7 +158,7 @@ def save_transcript(video_id: str) -> Union[Literal[0], Literal[1]]:
     return 0
 
 
-def query_transcript(video_id: str, time_range: str) -> str:
+def query_transcript(video_id: str, time_range: str, width: int) -> str:
     """
     Query transcript for a specific video within a given time range.
 
@@ -221,7 +221,7 @@ def query_transcript(video_id: str, time_range: str) -> str:
     enhanced_text = enhance_transcript(result_text)
 
     if enhanced_text and not enhanced_text.startswith('Error:'):
-        enhanced_text = format_markdown_text(enhanced_text)
+        enhanced_text = format_markdown_text(enhanced_text, width)
 
         with open(enhanced_file, 'w', encoding='utf-8') as f:
             f.write(enhanced_text)
@@ -280,7 +280,7 @@ def convert_topics_to_md_headers(text):
     return markdown_text
 
 
-def format_markdown_text(text, width=80):
+def format_markdown_text(text, width=60):
     """
     Format markdown text with proper line wrapping.
 
@@ -308,7 +308,10 @@ def format_markdown_text(text, width=80):
             normalized = ' '.join(paragraph.split())
             # Then wrap to specified width
             wrapped = textwrap.fill(
-                normalized, width=width, break_long_words=False, break_on_hyphens=True
+                normalized,
+                width=int(width),
+                break_long_words=False,
+                break_on_hyphens=True,
             )
             formatted_paragraphs.append(wrapped)
 
