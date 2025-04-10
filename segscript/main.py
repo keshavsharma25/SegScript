@@ -77,12 +77,12 @@ def list():
         show_header=True,
         header_style='bold magenta',
     )
-    table.add_column('#', style='dim cyan', justify='right')
+    table.add_column('#', style='dim cyan', justify='center')
     table.add_column('Video ID', style='cyan', no_wrap=True)
     table.add_column('Title', style='green')
 
-    for transcript in transcripts:
-        table.add_row(transcript['video_id'], transcript['title'])
+    for i, transcript in enumerate(transcripts, 1):
+        table.add_row(str(i), transcript['video_id'], transcript['title'])
 
     console.print(table)
 
