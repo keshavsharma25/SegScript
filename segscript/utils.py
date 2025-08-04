@@ -82,7 +82,7 @@ def save_transcript(video_id: str) -> Union[Literal[0], Literal[1]]:
         ytt_api = YouTubeTranscriptApi()
 
         # First, get the list of available transcripts
-        transcript_list = ytt_api.list_transcripts(video_id)
+        transcript_list = ytt_api.list(video_id)
 
         # Define various English language codes to check
         english_codes = ['en', 'en-US', 'en-GB', 'en-CA', 'en-AU']
