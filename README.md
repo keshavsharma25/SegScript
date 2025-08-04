@@ -86,7 +86,7 @@ segscript get VIDEO_ID
 segscript get VIDEO_ID --time-range "10:00;20:00"
 
 # Start interactive mode
-segscript interactive
+segscript prompt
 ```
 
 ### Interactive Mode
@@ -131,7 +131,7 @@ segscript get dQw4w9WgXcQ --time-range "1:30;2:45"
 ### Interactive browsing
 
 ```bash
-segscript interactive
+segscript prompt
 ```
 
 ## Next TODOs
