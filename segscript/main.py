@@ -183,6 +183,9 @@ def get(video_id, time_range, width):
 def prompt():
     """Start interactive mode for working with transcripts."""
     while True:
+        time.sleep(0.5)
+        os.system('cls' if os.name == 'nt' else 'clear')
+
         transcripts = get_all_transcripts()
 
         # Display available transcripts
@@ -214,7 +217,7 @@ def prompt():
             return
 
         if selection == 0:
-            console.print('\n➡️ Enter the YouTube Video ID to download:')
+            console.print('\nEnter the YouTube Video ID to download:')
             video_id_to_download = click.prompt('> ')
             console.print(
                 f'[bold blue]⏳ Downloading transcript for [cyan]{video_id_to_download}[/cyan]...[/bold blue]'
@@ -230,7 +233,7 @@ def prompt():
                     f'[bold red]❌ Failed to download transcript for {video_id_to_download}. Check ID or API limits.[/bold red]'
                 )
 
-            time.sleep(2)
+            time.sleep(1.5)
             os.system('cls' if os.name == 'nt' else 'clear')
 
             continue
@@ -285,14 +288,12 @@ def prompt():
                         console.print(Markdown(transcript_text))
 
             elif action == 2:
-                console.print(
-                    "➡️ Enter time range (e.g., '1:23;4:56' or '10:00;25:30'):"
-                )
+                console.print("Enter time range (e.g., '1:23;4:56' or '10:00;25:30'):")
                 time_range = click.prompt('> ')
                 console.print(
-                    '➡️Enter the max characters per line to format the transcript text (Default=60)'
+                    'Enter the max characters per line to format the transcript text (Default=60)'
                 )
-                width: int = click.prompt('> ')
+                width: int = click.prompt('> ', default=60)
 
                 console.print(
                     f'\n[bold blue]Processing transcript segment for [cyan]{selected_video_id}[/cyan] ({time_range})...[/bold blue]'
