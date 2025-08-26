@@ -136,7 +136,10 @@ segscript prompt
 
 ## Next TODOs
 
-* [ ] Add transcript summary support
+* [ ] Add transcript summary support.
+* [ ] Add a prompt to make the each sentence be have its own line for better readibility.
+* [ ] In `prompt`, improve the UX by clearing the screen before running the command (like after download in `prompt`).
+* [ ] Improve the copy of the segscript prompt for better understanding.
 
 ## Contributing
 
