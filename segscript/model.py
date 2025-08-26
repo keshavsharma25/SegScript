@@ -29,12 +29,12 @@ Your **sole objective** is to improve the readability of the provided transcript
 1.  **Filler Word Removal:** Delete **only** common filler words and verbal pauses. Examples include: "um", "uh", "ah", "hmm", "like" (when used as a filler, not for comparison), "you know", "sort of", "kind of", "basically", "actually", "really" (when used as filler/intensifier without adding meaning). Be extremely cautious: if a word *could* be intentional (e.g., repetition for emphasis), **preserve it**.
 2.  **Punctuation Addition:** Insert standard English punctuation (periods `.`, commas `,`, question marks `?`, exclamation points `!`, hyphens `-`, colons `:`) to form grammatically complete sentences and improve clarity. Ensure commas are used appropriately for clauses, lists, and separation.
 3.  **Sentence Capitalization:** Ensure every sentence begins with a capital letter.
-4.  **Paragraph Segmentation:** Divide the text into logical paragraphs. A new paragraph should typically start when the speaker shifts to a new distinct point, idea, or sub-topic. Do **not** create paragraphs for every sentence; group related sentences together.
-5.  **Topic Marker Insertion:** Insert topic markers using the exact format `[TOPIC: Concise Topic Name]` on a **new line directly before** the paragraph where a significant new topic is introduced.
-    *   The "Concise Topic Name" should accurately summarize the *main subject* of the subsequent paragraph(s).
+4.  **Single-Sentence Paragraphs:** Each complete sentence should be placed on its own line as a separate paragraph. This improves readability by creating clear visual breaks between complete thoughts. Do **not** group multiple sentences together into single paragraphs.
+5.  **Topic Marker Insertion:** Insert topic markers using the exact format `[TOPIC: Concise Topic Name]` on a **new line directly before** the sentence where a significant new topic is introduced.
+    *   The "Concise Topic Name" should accurately summarize the *main subject* of the subsequent sentence(s).
     *   Use topic markers **sparingly**, only for clear transitions between major subjects. Do **not** add them for minor elaborations or continuations of the same topic.
     *   **IMPORTANT:** The `[TOPIC: ...]` marker is **purely an organizational label**. It is added *in addition* to the enhanced text. It does **not** replace any original text.
-    *   **CRITICAL:** The act of adding a topic marker must **not** change how you apply rules 1-4 to the text *within* the paragraph that follows it. Enhance the text following the marker using the exact same rules (punctuation, filler removal, no paraphrasing, etc.) as any other part of the transcript. **Do not shorten, summarize, or condense the content of a paragraph simply because a topic marker precedes it.**
+    *   **CRITICAL:** The act of adding a topic marker must **not** change how you apply rules 1-4 to the text *within* the sentences that follow it. Enhance the text following the marker using the exact same rules (punctuation, filler removal, no paraphrasing, etc.) as any other part of the transcript. **Do not shorten, summarize, or condense the content of sentences simply because a topic marker precedes them.**
 
 **Critical Constraints - Adhere Strictly:**
 
@@ -58,7 +58,13 @@ Raw: "so when we're talking about um asynchronous programming in javascript we u
 Enhanced:
 [TOPIC: Asynchronous Programming in Javascript]
 
-When we're talking about asynchronous programming in JavaScript, we use promises which are objects that represent the eventual completion or failure of an asynchronous operation. The way you create a promise is you use the new Promise constructor and you pass in a function that takes two parameters: resolve and reject. Inside that function, you do your async operation and when it's done, you call resolve with the result or if there's an error, you call reject. Then you can use then and catch methods to handle the results or errors.
+When we're talking about asynchronous programming in JavaScript, we use promises which are objects that represent the eventual completion or failure of an asynchronous operation.
+
+The way you create a promise is you use the new Promise constructor and you pass in a function that takes two parameters: resolve and reject.
+
+Inside that function, you do your async operation and when it's done, you call resolve with the result or if there's an error, you call reject.
+
+Then you can use then and catch methods to handle the results or errors.
 
 EXAMPLE 2:
 Raw: "so gradient descent is basically um an optimization algorithm used to minimize the cost function in various machine learning algorithms and the way it works is um you start with some initial parameter values and then you compute the gradient of the cost function which is like um the direction of steepest increase and then you update the parameters in the negative direction of the gradient and uh you do this iteratively until the algorithm converges and um there are different variants like batch gradient descent and stochastic gradient descent which uh differ in how many samples they use to compute the gradient at each step"
@@ -66,7 +72,13 @@ Raw: "so gradient descent is basically um an optimization algorithm used to mini
 Enhanced:
 [TOPIC: Gradient Descent]
 
-Gradient descent is an optimization algorithm used to minimize the cost function in various machine learning algorithms. The way it works is you start with some initial parameter values and then you compute the gradient of the cost function, which is the direction of steepest increase. Then you update the parameters in the negative direction of the gradient. You do this iteratively until the algorithm converges.
+Gradient descent is an optimization algorithm used to minimize the cost function in various machine learning algorithms.
+
+The way it works is you start with some initial parameter values and then you compute the gradient of the cost function, which is the direction of steepest increase.
+
+Then you update the parameters in the negative direction of the gradient.
+
+You do this iteratively until the algorithm converges.
 
 [TOPIC: Gradient Descent Variants]
 
