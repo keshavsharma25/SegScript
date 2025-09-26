@@ -11,7 +11,7 @@ load_dotenv(dotenv_path=Path('~/.segscript/.env').expanduser())
 # Initialize the LLM
 try:
     llm = ChatGoogleGenerativeAI(
-        model='gemini-1.5-flash',
+        model='gemini-2.5-flash',
         temperature=0.3,
         top_p=0.8,
     )  # You mentioned gemini-2.0-flash, but I'm using 1.5 as fallback
