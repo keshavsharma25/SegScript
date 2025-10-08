@@ -15,6 +15,7 @@ dependencies = [
 	"python-dotenv",
 	"rich",
 	"requests",
+	"grpcio==1.60.1",
 ]
 readme = "README.md"
 
